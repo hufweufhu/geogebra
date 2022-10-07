@@ -267,36 +267,26 @@ public class ToolManagerDialogD extends Dialog
 	 */
 	private void openTools(JList<Macro> toolList) {
 		Object[] sel = toolList.getSelectedValuesList().toArray();
-		if (sel == null || sel.length == 0) {
+		if (sel.length == 0) {
 			return;
 		}
 
-		for (int i = 0; i < sel.length; i++) {
-			final Macro macro = (Macro) sel[i];
-			Thread runner = new Thread() {
-				@Override
-				public void run() {
-					app.setWaitCursor();
-					// avoid deadlock with current app
-					SwingUtilities.invokeLater(new Runnable() {
-
-						@Override
-						public void run() {
-							GeoGebraFrame newframe = ((GeoGebraFrame) app
-									.getFrame()).createNewWindow(null, macro);
-							newframe.setTitle(macro.getCommandName());
-							byte[] byteArray = app.getMacrosBefore(macro);
-							newframe.getApplication()
-									.loadMacroFileFromByteArray(byteArray,
-											false);
-							newframe.getApplication().openMacro(macro);
-							app.setDefaultCursor();
-
-						}
-					});
-
-				}
-			};
+		for (Object s : sel) {
+			final Macro macro = (Macro) s;
+			Thread runner = new Thread(() -> {
+				app.setWaitCursor();
+				// avoid deadlock with current app
+				SwingUtilities.invokeLater(() -> {
+					GeoGebraFrame newFrame =
+							((GeoGebraFrame) app.getFrame()).createNewWindow(null, macro);
+					newFrame.setTitle(macro.getCommandName());
+					byte[] byteArray = app.getMacrosBefore(macro);
+					newFrame.getApplication()
+							.loadMacroFileFromByteArray(byteArray, false);
+					newFrame.getApplication().openEditMacro(macro);
+					app.setDefaultCursor();
+				});
+			});
 			runner.start();
 
 			this.setVisible(false);
