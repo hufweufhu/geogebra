@@ -682,7 +682,7 @@ public class GgbAPIW extends GgbAPI {
 
 	private void writeMacroImage(GgbFile archive, Macro macro) {
 		((ImageManagerW) app.getImageManager())
-				.writeMacroImages(new ArrayList<>(Arrays.asList(macro)), archive);
+				.writeMacroImages(Arrays.asList(macro), archive);
 	}
 
 	/**
